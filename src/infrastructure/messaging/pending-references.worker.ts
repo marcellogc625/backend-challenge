@@ -25,7 +25,7 @@ export class PendingReferencesWorker implements OnModuleInit, OnModuleDestroy {
   async stop(): Promise<void> {
     this.isRunning = false;
     if (this.loopPromise) {
-      await this.loopPromise;
+      await Promise.race([this.loopPromise, new Promise((resolve) => setTimeout(resolve, 200))]);
     }
   }
 

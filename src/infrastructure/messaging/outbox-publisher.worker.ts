@@ -34,10 +34,10 @@ export class OutboxPublisherWorker implements OnModuleInit, OnModuleDestroy {
 
   async stop(): Promise<void> {
     this.isRunning = false;
-    if (this.loopPromise) {
-      await this.loopPromise;
-    }
     this.sqsClient.destroy();
+    if (this.loopPromise) {
+      await Promise.race([this.loopPromise, new Promise((resolve) => setTimeout(resolve, 200))]);
+    }
   }
 
   /**

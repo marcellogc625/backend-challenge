@@ -1,5 +1,5 @@
-import type { ProcessWagerTransactionCommand } from "@application/dto/wager-transaction.dto";
-import type { ProcessWagerTransactionUseCase } from "@application/use-cases/process-wager-transaction.use-case";
+import type { ProcessWagerTransactionCommand } from "@application/dto/wager-transaction.dto.ts";
+import { ProcessWagerTransactionUseCase } from "@application/use-cases/process-wager-transaction.use-case.ts";
 import {
   ChangeMessageVisibilityCommand,
   DeleteMessageCommand,
@@ -47,10 +47,10 @@ export class WagerTransactionsConsumer implements OnModuleInit, OnModuleDestroy 
 
   async stop(): Promise<void> {
     this.isRunning = false;
-    if (this.loopPromise) {
-      await this.loopPromise;
-    }
     this.sqsClient.destroy();
+    if (this.loopPromise) {
+      await Promise.race([this.loopPromise, new Promise((resolve) => setTimeout(resolve, 200))]);
+    }
   }
 
   /**
